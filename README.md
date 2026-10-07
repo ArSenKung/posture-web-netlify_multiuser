@@ -16,14 +16,14 @@
 > Functions ใช้ไม่ได้กับการลากโฟลเดอร์วาง (drag & drop) ต้อง deploy จาก Git หรือ Netlify CLI
 
 **ทางที่ 1: Git (แนะนำ)**
-1. push โฟลเดอร์ `web/` นี้ขึ้น GitHub (เป็น root ของ repo)
+1. push ไฟล์ทั้งหมดในโฟลเดอร์นี้ขึ้น GitHub (`netlify.toml` ต้องอยู่ที่ root ของ repo)
 2. Netlify → Add new site → Import from Git → เลือก repo (ค่า build อ่านจาก `netlify.toml` เอง)
 3. จบ — ไม่ต้องตั้งตัวแปรใดๆ
 
 **ทางที่ 2: CLI**
 ```
 npm i -g netlify-cli
-cd web && npm install
+npm install
 netlify login && netlify init
 netlify deploy --prod
 ```
