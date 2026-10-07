@@ -59,10 +59,62 @@ html{scroll-behavior:smooth}body{background:var(--bg)!important;color:var(--ink)
 .bloom-accent{background-color:#000;background-image:radial-gradient(circle at 65% 45%,rgba(52,52,50,.6),transparent 34%),radial-gradient(circle at 28% 74%,rgba(18,18,17,.5),transparent 44%);}
 @media(max-width:900px){.app-main{background:var(--bg)}.hero{gap:36px}}@media(max-width:560px){.page{padding-top:30px}.hero h1{font-size:clamp(2.15rem,11vw,3.1rem)}.toy{padding:18px}.feat{margin-top:38px}.component-kpis{gap:7px}.component-stat{padding:12px}.component-stat strong{font-size:1.15rem}}
 
+
+/* ---------- Mobile: drawer menu + scale fixes ---------- */
+.connect-layout>*,.dashboard-grid>*,.stats-grid>*,.activity-grid>*,.grid2>*,.hero>*{min-width:0}
+.steps li{grid-template-columns:34px minmax(0,1fr)}
+.steps li,.note,.tip,.panel p{overflow-wrap:anywhere}
+pre{max-width:100%}
+@media(max-width:900px){.connect-layout,.dashboard-grid,.stats-grid,.activity-grid,.grid2,.hero{grid-template-columns:minmax(0,1fr)}}
+html{-webkit-text-size-adjust:100%}
+body{overflow-x:hidden}
+.app-main{flex:1 1 0;min-width:0}
+.menu-btn{display:none;flex:none;width:42px;height:42px;border:1px solid var(--line);border-radius:10px;background:var(--panel-solid);cursor:pointer;padding:0;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.menu-btn span{display:block;width:18px;height:2px;border-radius:2px;background:var(--ink)}
+.sidebar-brand,.sidebar-brand:hover{text-decoration:none;color:var(--ink)}
+.sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:39}
+.sidebar-backdrop[hidden]{display:none}
+.app-sidebar{height:100vh;height:100dvh;overflow-y:auto}
+.sidebar-toggle-mobile-close{display:none}
+@media(max-width:900px){
+ .menu-btn{display:flex}
+ .app-sidebar,.app-sidebar.is-collapsed,.app-sidebar:not(.is-collapsed){position:fixed;top:0;left:0;bottom:0;z-index:40;width:min(82vw,288px);transform:translateX(-102%);transition:transform .25s ease;box-shadow:none;padding-top:max(12px,env(safe-area-inset-top,0px))}
+ .app-sidebar.is-open{transform:none;box-shadow:8px 0 30px rgba(0,0,0,.25)}
+ .app-sidebar.is-collapsed .sidebar-label,.app-sidebar.is-collapsed .sidebar-account,.app-sidebar.is-collapsed .sidebar-section{display:revert}
+ .app-sidebar.is-collapsed .sidebar-account{display:block}
+ .app-main,.app-sidebar.is-collapsed~.app-main,.app-sidebar:not(.is-collapsed)~.app-main{margin-left:0!important;width:100%}
+ .sidebar-link{height:48px}
+ .site-header .header-inner{height:auto;min-height:60px;flex-wrap:nowrap;gap:10px;padding-top:9px;padding-bottom:9px}
+ .site-header .brand{min-width:0}
+ .site-header .brand-copy strong{white-space:nowrap}
+ .header-actions{margin-left:auto}
+ .wrap{padding-left:16px;padding-right:16px}
+ .page{padding:28px 0 60px}
+ .section-head{display:block}
+ .component-kpis,.kpis{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+ body{font-size:15px}
+ .hero h1{font-size:clamp(2rem,10.5vw,2.8rem)}
+ .btns .btn{flex:1 1 100%;text-align:center}
+ .seg{display:flex;width:100%}.seg button{flex:1;padding:9px 6px}
+ .bars div{grid-template-columns:92px 1fr 38px}
+ .url{flex-direction:column}.url .btn,.url input{width:100%}
+ .url code{flex-basis:auto}
+ .live{padding:16px}
+ .chars li{flex:1 1 calc(50% - 10px)}
+ .heat{grid-template-columns:28px repeat(12,1fr);gap:3px}
+ pre{font-size:.78rem;padding:14px}
+ .panel{padding:16px}
+ button,.btn,.sidebar-link,input,select{min-height:44px}
+ input,select,textarea{font-size:16px}
+ .heat u{min-height:0}
+}
 </style>
 </head>
 <body>
 <div class="app-shell">
+<div class="sidebar-backdrop" id="sbBackdrop" hidden></div>
 <aside class="app-sidebar" id="appSidebar">
   <div class="sidebar-title"><a class="sidebar-brand" href="#/home"><span class="sidebar-logo">🐱</span><span class="sidebar-account"><strong>Posture Shimeji</strong><small>Posture companion</small></span></a><span class="sidebar-chevron">⌄</span></div>
   <nav class="sidebar-nav" id="nav" aria-label="เมนูหลัก">
@@ -72,13 +124,14 @@ html{scroll-behavior:smooth}body{background:var(--bg)!important;color:var(--ink)
     <a class="sidebar-link" href="#/connect"><span class="sidebar-icon">⌁</span><span class="sidebar-label">เชื่อมต่อแอป</span></a>
   </nav>
   <div class="sidebar-section">Account</div>
-  <div class="sidebar-nav"><a class="sidebar-link" href="#/connect"><span class="sidebar-icon">⚙</span><span class="sidebar-label">ตั้งค่าการเชื่อมต่อ</span></a><a class="sidebar-link" href="#/connect"><span class="sidebar-icon">?</span><span class="sidebar-label">ช่วยเหลือ</span></a></div>
+  <div class="sidebar-nav"><a class="sidebar-link" href="#/connect"><span class="sidebar-icon">⚙</span><span class="sidebar-label">ตั้งค่าการเชื่อมต่อ</span></a></div>
   <div class="sidebar-bottom"><button class="sidebar-toggle" id="sidebarToggle" type="button"><span class="sidebar-toggle-icon">‹</span><span class="sidebar-label">ซ่อนเมนู</span></button></div>
 </aside>
 <div class="app-main">
 <header class="site-header"><div class="wrap header-inner">
+  <button id="menuBtn" class="menu-btn" type="button" aria-label="เปิดเมนู" aria-controls="appSidebar" aria-expanded="false"><span></span><span></span><span></span></button>
   <a class="brand" href="#/home"><span class="brand-mark">🐱</span><span class="brand-copy"><strong>Posture Shimeji</strong><small>your posture companion</small></span></a>
-  <div class="header-actions"><div class="component-actions"><button class="icon-button" type="button" aria-label="การแจ้งเตือน">♢<span class="notification-dot"></span></button></div><button id="theme" title="สลับโหมดสว่าง/มืด" aria-label="สลับโหมดสว่างหรือมืด">🌓</button></div>
+  <div class="header-actions"><button id="theme" title="สลับโหมดสว่าง/มืด" aria-label="สลับโหมดสว่างหรือมืด">🌓</button></div>
 </div></header>
 <main class="wrap">
 <section class="page" data-page="home"><div class="hero"><div><div class="eyebrow">Posture care, made friendly</div><h1>นั่งดีขึ้นได้<br><span style="color:var(--acc)">ทีละนิดทุกวัน</span></h1><p>เพื่อนตัวเล็กที่ช่วยสังเกตท่านั่งของคุณอย่างอ่อนโยน ดูภาพรวมได้ง่าย รู้ทันช่วงที่เริ่มค่อม และค่อย ๆ สร้างนิสัยที่ดีขึ้น</p><div class="btns"><a class="btn main" href="#/dashboard">เปิดแดชบอร์ด <span aria-hidden="true">→</span></a><a class="btn" href="#/connect">เริ่มเชื่อมต่อแอป</a></div><div class="hero-badges"><span>ไม่ส่งภาพจากกล้อง</span><span>ดูสถิติย้อนหลัง 30 วัน</span><span>เตือนแบบพอดี</span></div></div><div class="hero-showcase"><div class="toy"><div class="toy-topline"><span>LIVE PREVIEW</span><span class="status-dot">กำลังสบายดี</span></div><svg viewBox="0 0 240 230" role="img" aria-label="แมวส้มแสนน่ารักที่เปลี่ยนท่าตามแถบเลื่อน">
@@ -276,7 +329,15 @@ $('#theme').onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==='dar
   root.dataset.theme=dark?'light':'dark';try{localStorage.setItem('theme',root.dataset.theme)}catch(e){}};
 const sb=$('#appSidebar'), sbt=$('#sidebarToggle');
 try{if(localStorage.getItem('sidebar-collapsed')==='1')sb.classList.add('is-collapsed')}catch(e){}
-sbt.onclick=()=>{sb.classList.toggle('is-collapsed');try{localStorage.setItem('sidebar-collapsed',sb.classList.contains('is-collapsed')?'1':'0')}catch(e){}};
+const mq=matchMedia('(max-width:900px)'),mb=$('#menuBtn'),bd=$('#sbBackdrop');
+function drawer(open){sb.classList.toggle('is-open',open);bd.hidden=!open;mb.setAttribute('aria-expanded',open?'true':'false');document.body.style.overflow=open?'hidden':''}
+sbt.onclick=()=>{if(mq.matches){drawer(false);return}sb.classList.toggle('is-collapsed');try{localStorage.setItem('sidebar-collapsed',sb.classList.contains('is-collapsed')?'1':'0')}catch(e){}};
+mb.onclick=()=>drawer(!sb.classList.contains('is-open'));
+bd.onclick=()=>drawer(false);
+sb.addEventListener('click',e=>{if(e.target.closest('a'))drawer(false)});
+addEventListener('keydown',e=>{if(e.key==='Escape')drawer(false)});
+mq.addEventListener?mq.addEventListener('change',()=>drawer(false)):mq.addListener(()=>drawer(false));
+
 $('#copy').onclick=async()=>{const b=$('#copy');try{await navigator.clipboard.writeText($('#wurl').textContent);b.textContent='คัดลอกแล้ว'}catch(e){b.textContent='เลือกข้อความแล้วคัดลอกเอง'}setTimeout(()=>b.textContent='คัดลอก URL',1800)};
 $('#tokSave').onclick=()=>{try{localStorage.setItem('viewtoken',$('#tok').value.trim())}catch(e){}$('#tok').value='';poll(true)};
 if(demo){mkDemo();setInterval(demoTick,6000)}else{poll(true);setInterval(()=>{if(!document.hidden)poll()},5000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()})}
